@@ -1,8 +1,8 @@
 import streamlit as st
 
-# ----------------------------
-# 별자리 데이터
-# ----------------------------
+# =========================
+# 별자리 데이터 (12개 모두)
+# =========================
 zodiac_data = {
     "♈ 양자리 (3/21~4/19)": {
         "특징": "열정적이고 도전적인 성격! 💪🔥",
@@ -78,57 +78,76 @@ zodiac_data = {
     }
 }
 
-# ----------------------------
-# 앱 설정
-# ----------------------------
-st.set_page_config(page_title="별자리 진로 추천", page_icon="🌟", layout="wide")
-
-st.title("🌌 별자리 기반 진로 추천")
-st.markdown("✨ 당신의 별자리에 맞는 성격, 행운 컬러, 잘 맞는 궁합, 추천 직업을 확인해보세요! ✨")
-
-# 별자리 선택
-zodiac = st.selectbox("🌟 당신의 별자리를 선택하세요!", options=list(zodiac_data.keys()))
-
-if zodiac:
-    info = zodiac_data[zodiac]
-
-    # 카드 스타일 출력
+# =========================
+# 함수 모듈화
+# =========================
+def display_card(title, content, color="#f0f9ff"):
+    """
+    카드 형태로 정보를 출력하는 함수
+    title : 카드 제목
+    content : 카드 내용
+    color : 배경색 (기본값 파스텔 블루)
+    """
     st.markdown(
         f"""
-        <div style="background-color:#fff7e6;
+        <div style="background-color:{color};
                     padding:20px;
-                    margin:10px 0;
-                    border-radius:20px;
-                    box-shadow: 3px 3px 10px rgba(0,0,0,0.1);
+                    margin:10px;
+                    border-radius:15px;
+                    box-shadow: 3px 3px 8px rgba(0,0,0,0.1);
                     font-size:18px;">
-            <h3>{zodiac}</h3>
-            <p><b>✨ 특징:</b> {info['특징']}</p>
-            <p><b>🎨 행운 컬러:</b> {info['컬러']}</p>
-            <p><b>❤️ 잘 맞는 궁합:</b> {info['궁합']}</p>
+            <b>{title}</b><br>{content}
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    # 직업 카드
-    st.markdown("### 💼 추천 직업")
-    cols = st.columns(3)
-    for i, job in enumerate(info["직업"]):
-        with cols[i % 3]:
-            st.markdown(
-                f"""
-                <div style="background-color:#f0f9ff;
-                            padding:20px;
-                            margin:10px;
-                            border-radius:20px;
-                            box-shadow: 3px 3px 10px rgba(0,0,0,0.1);
-                            text-align:center;
-                            font-size:20px;">
-                    {job}
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+def get_zodiac_info(zodiac):
+    """
+    선택한 별자리 데이터를 반환하는 함수
+    """
+    return zodiac_data.get(zodiac, None)
 
-st.markdown("---")
-st.markdown("🌟 Made with ❤️ using Streamlit 🌟")
+# =========================
+# 메인 앱 실행
+# =========================
+def main():
+    # 앱 기본 설정
+    st.set_page_config(page_title="별자리 진로 추천", page_icon="🌟", layout="wide")
+
+    # 앱 헤더
+    st.title("🌌 별자리 기반 진로 추천")
+    st.markdown("✨ 당신의 별자리에 맞는 성격, 행운 컬러, 궁합, 추천 직업을 확인해보세요! ✨")
+
+    # 별자리 선택
+    zodiac = st.selectbox("🌟 당신의 별자리를 선택하세요!", options=list(zodiac_data.keys()))
+
+    # 결과 출력
+    if zodiac:
+        info = get_zodiac_info(zodiac)
+
+        # 2열 레이아웃 (특징 / 컬러+궁합)
+        col1, col2 = st.columns(2)
+
+        with col1:
+            display_card("✨ 특징", info["특징"], "#fff7e6")
+        with col2:
+            display_card("🎨 행운 컬러", info["컬러"], "#f0fff4")
+            display_card("❤️ 잘 맞는 궁합", info["궁합"], "#f0f9ff")
+
+        # 직업 추천 (3열)
+        st.markdown("### 💼 추천 직업")
+        cols = st.columns(3)
+        for i, job in enumerate(info["직업"]):
+            with cols[i % 3]:
+                display_card("직업 추천", job)
+
+    # 푸터
+    st.markdown("---")
+    st.markdown("🌟 Made with ❤️ using Streamlit 🌟")
+
+# =========================
+# 프로그램 시작점
+# =========================
+if __name__ == "__main__":
+    main()
